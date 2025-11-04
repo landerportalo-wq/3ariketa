@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Funtzioak - Demos</title>
+    <style>
+        body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; padding: 20px; background: #f7f7f8; color: #222; }
+        section { background: #fff; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        h1 { margin-bottom: 18px; }
+        h2 { font-size: 1.05rem; margin: 6px 0 10px; }
+        button { padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc; background: #fafafa; cursor: pointer; }
+        input[type="number"], input[type="text"] { padding: 6px 8px; border-radius: 6px; border: 1px solid #ccc; margin-right: 6px; }
+        ul { margin: 8px 0 0 18px; }
+        .small { font-size: 0.9rem; color: #444; }
+        .btn-delete { margin-left: 8px; padding: 2px 6px; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+    <h1>JavaScript Funtzio ezberdinak</h1>
+
+    <section>
+        <h2>1. Testu-Aldatzailea</h2>
+        <p id="testu_aldagarria">Rafa Nadal (1986, Manacor) tenislari espainiar ospetsua da, historiako jokalaririk arrakastatsu eta diziplinatuenetakoa.
+Bere 22 Grand Slam tituluengatik eta borroka-espirituagatik mundu osoan ezaguna da.</p>
+        <button type="button" onclick="aldatuTestua()">Testua aldatu</button>
+    </section>
+
+    <section>
+        <h2>2. Kolore Txandakatzailea</h2>
+        <p id="kolore_aldagarria">Kaixo egunon, Lander deitzen naiz</p>
+        <button type="button" onclick="aldatuKolorea()">Kolorea txandakatu</button>
+    </section>
+
+    <section>
+        <h2>3. Elementuen Ezkutagailua</h2>
+        <p id="ezkutatu_hau">Bihar arte</p>
+        <button type="button" onclick="txandakatuEzkutatzea()">Txandakatu</button>
+    </section>
+
+    <section>
+        <h2>4. Batuketa Kalkulagailua</h2>
+        <input type="number" id="zenbaki1" placeholder="Zenbakia 1"> +
+        <input type="number" id="zenbaki2" placeholder="Zenbakia 2">
+        <button type="button" onclick="batuketaEgin()">Batu</button>
+        <p class="small">Emaitza: <span id="emaitza4"></span></p>
+    </section>
+
+    <section>
+        <h2>5. Zerrenda Dinamikoa</h2>
+        <input type="text" id="elementu_berria" placeholder="Elementu berria idatzi">
+        <button type="button" onclick="gehituElementua()">Gehitu</button>
+        <ul id="zerrenda_dinamikoa"></ul>
+    </section>
+
+    <section>
+        <h2>6. Klik Kontagailua</h2>
+        <p class="small">Klika kopurua: <span id="kontagailu_emaitza">0</span></p>
+        <button type="button" onclick="kontatuKlik()">Klikatu</button>
+    </section>
+
+    <section>
+        <h2>7. Zenbaki Asmatzearen Jokoa (1-5)</h2>
+        <input type="number" id="asmatutako_zenbakia" placeholder="Zure zenbakia (1-5)" min="1" max="5">
+        <button type="button" onclick="konprobatuZenbakia()">Konprobatu</button>
+        <p id="joko_emaitza" class="small"></p>
+    </section>
+
+    <section>
+        <h2>8. Atzeko Planoaren Kolore-Aldatzailea</h2>
+        <button type="button" onclick="aldatuAtzekoPlanoarenKolorea()">Aldatu</button>
+    </section>
+
+    <!-- Skript-inga: hemen daude aldagai globalak eta funtzio guztiak -->
+    <script>
+        // Aldagai globalak (segurtasunagatik lehen definituta)
+        window.klikKopurua = 0;
+        window.zenbakiSekretua = Math.floor(Math.random() * 5) + 1;
+
+        // 1. Testu-Aldatzailea
+        function aldatuTestua() {
+            const p = document.getElementById('testu_aldagarria');
+            if (!p) return;
+            const hasierako = 'Hau da hasierako testua';
+            const aldatu = 'Testua aldatu da!';
+            p.textContent = (p.textContent === hasierako) ? aldatu : hasierako;
+        }
+
+        // 2. Kolore Txandakatzailea (Estiloak JS-tik aplikatuz)
+        function aldatuKolorea() {
+            const p = document.getElementById('kolore_aldagarria');
+            if (!p) return;
+            const koloreak = ['#1E90FF','#FF6347','#2E8B57','#FFD700','#8A2BE2'];
+            let idx = parseInt(p.dataset.koloreidx || '0', 10);
+            idx = (idx + 1) % koloreak.length;
+            p.style.color = koloreak[idx];
+            p.dataset.koloreidx = String(idx);
+        }
+
+        // 3. Elementuen Ezkutagailua (display propietatea aldatuz)
+        function txandakatuEzkutatzea() {
+            const p = document.getElementById('ezkutatu_hau');
+            if (!p) return;
+            // Erabiltzen dugu computed style presence kontuan izateko
+            const visible = window.getComputedStyle(p).display !== 'none';
+            p.style.display = visible ? 'none' : 'block';
+        }
+
+        // 4. Batuketa Kalkulagailua
+        function batuketaEgin() {
+            const n1el = document.getElementById('zenbaki1');
+            const n2el = document.getElementById('zenbaki2');
+            const out = document.getElementById('emaitza4');
+            if (!n1el || !n2el || !out) return;
+
+            const v1 = parseFloat(n1el.value);
+            const v2 = parseFloat(n2el.value);
+
+            if (isNaN(v1) && isNaN(v2)) {
+                out.textContent = 'Mesedez sartu zenbakiak.';
+                return;
+            }
+            const a = isNaN(v1) ? 0 : v1;
+            const b = isNaN(v2) ? 0 : v2;
+            out.textContent = a + b;
+        }
+
+        // 5. Testu-Gehitzailea (Elementu berriak sortzea)
+        function gehituElementua() {
+            const input = document.getElementById('elementu_berria');
+            const zerrenda = document.getElementById('zerrenda_dinamikoa');
+            if (!input || !zerrenda) return;
+
+            const tx = input.value.trim();
+            if (tx === '') {
+                // erakutsi momentuz placeholder moduan abisua
+                input.placeholder = 'Mesedez idatzi bat';
+                input.focus();
+                return;
+            }
+
+            const li = document.createElement('li');
+            li.textContent = tx;
+
+            // Gehitu ezabatzeko botoia
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = 'Ezabatu';
+            btn.className = 'btn-delete';
+            btn.addEventListener('click', function () {
+                if (li.parentNode) li.parentNode.removeChild(li);
+            });
+
+            li.appendChild(btn);
+            zerrenda.appendChild(li);
+            input.value = '';
+            input.placeholder = 'Elementu berria idatzi';
+            input.focus();
+        }
+
+        // 6. Kontagailua (aldagai globalak erabiliz)
+        function kontatuKlik() {
+            if (typeof window.klikKopurua === 'undefined') window.klikKopurua = 0;
+            window.klikKopurua += 1;
+            const span = document.getElementById('kontagailu_emaitza');
+            if (span) span.textContent = String(window.klikKopurua);
+        }
+
+        // 7. Zenbaki Asmatzearen Jokoa
+        function konprobatuZenbakia() {
+            const inpt = document.getElementById('asmatutako_zenbakia');
+            const out = document.getElementById('joko_emaitza');
+            if (!inpt || !out) return;
+
+            const guess = parseInt(inpt.value, 10);
+            if (isNaN(guess)) {
+                out.textContent = 'Mesedez sartu zenbaki oso bat (1-5).';
+                return;
+            }
+            if (guess < 1 || guess > 5) {
+                out.textContent = 'Zenbakia 1 eta 5 artean egon behar da.';
+                return;
+            }
+
+            if (typeof window.zenbakiSekretua === 'undefined') {
+                window.zenbakiSekretua = Math.floor(Math.random() * 5) + 1;
+            }
+
+            if (guess === window.zenbakiSekretua) {
+                out.textContent = 'Zorionak! Asmatuta dago: ' + window.zenbakiSekretua + '.';
+                // berria sortu jokorako
+                window.zenbakiSekretua = Math.floor(Math.random() * 5) + 1;
+            } else if (guess < window.zenbakiSekretua) {
+                out.textContent = 'Txikiagoa da. Saiatu beste zenbaki batekin.';
+            } else {
+                out.textContent = 'Handiagoa da. Saiatu beste zenbaki batekin.';
+            }
+            inpt.value = '';
+            inpt.focus();
+        }
+
+        // 8. Atzeko Planoaren Kolore-Aldatzailea (Random)
+        function aldatuAtzekoPlanoarenKolorea() {
+            const koloreak = ['#FFFAF0', '#F0FFF0', '#F0F8FF', '#FFF8DC', '#FFF0FF', '#F7F7FF'];
+            const k = koloreak[Math.floor(Math.random() * koloreak.length)];
+            document.body.style.backgroundColor = k;
+        }
+
+        // (Aukeraz) Konprobazio txikia: kontsolan erakutsi zerbait
+        // console.log('Funtzioak kargatuak daude. klikKopurua =', window.klikKopurua);
+    </script>
+</body>
+</html>
